@@ -71,7 +71,11 @@ module RestPack
         when association.macro == :belongs_to
           model.send(association.foreign_key).try(:to_s)
         when association.macro.to_s.match(/has_/)
-          model.send(association.name).pluck(:id).map(&:to_s)
+          if model.send(association.name).loaded?
+            model.send(association.name).collect { |associated| associated.id.to_s }
+          else
+            model.send(association.name).pluck(:id).map(&:to_s)
+          end
         end
         unless links_value.blank?
           data[:links][association.name.to_sym] = links_value
@@ -85,7 +89,7 @@ module RestPack
     end
 
     module ClassMethods
-      attr_accessor :model_class, :key
+      attr_accessor :model_class, :href_prefix, :key
 
       def array_as_json(models, context = {})
         new.as_json(models, context)
@@ -105,6 +109,10 @@ module RestPack
 
       def model_class
         @model_class || self.name.chomp('Serializer').constantize
+      end
+
+      def href_prefix
+        @href_prefix || RestPack::Serializer.config.href_prefix
       end
 
       def key
