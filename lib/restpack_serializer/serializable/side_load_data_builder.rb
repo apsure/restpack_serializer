@@ -9,7 +9,9 @@ module RestPack
       end
 
       def side_load_belongs_to
-        foreign_keys = @models.map { |model| model.send(@association.foreign_key) }.uniq
+        foreign_keys = @models.map { |model| model.send(@association.foreign_key) }
+                              .compact
+                              .uniq
         side_load = @association.klass.find(foreign_keys)
         json_model_data = side_load.map { |model| @serializer.as_json(model) }
         { @association.plural_name.to_sym => json_model_data, meta: { } }
