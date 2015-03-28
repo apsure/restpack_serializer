@@ -52,7 +52,7 @@ module RestPack
         options.page_size=1000 # pull all side loads in
         yield options
         options.include_links = false
-        serializer_class.page_with_options(options)
+        serializer_class.page_with_options(options, false)
       end
     end
   end

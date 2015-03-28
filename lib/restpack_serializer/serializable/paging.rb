@@ -6,14 +6,13 @@ module RestPack::Serializer::Paging
       page_with_options RestPack::Serializer::Options.new(self, params, scope, context)
     end
 
-    def page_with_options(options)
+    def page_with_options(options, include_meta = true)
       page = options.scope_with_filters.page(options.page).per(options.page_size)
       page = page.reorder(options.sorting) if options.sorting.any?
 
       result = RestPack::Serializer::Result.new
       result.resources[self.key] = serialize_page(page, options)
-      result.meta[self.key] = serialize_meta(page, options)
-
+      result.meta[self.key] = serialize_meta(page, options) if include_meta
       if options.include_links
         result.links = self.links
         Array(RestPack::Serializer::Factory.create(*options.include)).each do |serializer|
