@@ -14,7 +14,15 @@ module RestPack::Serializer
       @sorting = sorting_from_params(params, serializer)
       @serializer = serializer
       @model_class = serializer.model_class
-      @scope = scope || model_class.send(:all)
+
+      if serializer.respond_to?(:scope)
+        @scope = serializer.send(:scope, scope || model_class.send(:all), context)
+      elsif scope
+        @scope = scope
+      else
+        @scope = model_class.send(:all)
+      end
+
       @context = context
       @include_links = true
     end
