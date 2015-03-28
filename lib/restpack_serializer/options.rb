@@ -17,10 +17,8 @@ module RestPack::Serializer
 
       if serializer.respond_to?(:scope)
         @scope = serializer.send(:scope, scope || model_class.send(:all), context)
-      elsif scope
-        @scope = scope
       else
-        @scope = model_class.send(:all)
+        @scope = scope || model_class.send(:all)
       end
 
       @context = context
