@@ -49,7 +49,7 @@ module RestPack
         return {} if @models.empty?
         serializer_class = @serializer.class
         options = RestPack::Serializer::Options.new(serializer_class, {}, nil, options.context)
-        options.page_size=1000 # pull all side loads in
+        options.page_size=2000 # pull all side loads in
         yield options
         options.include_links = false
         serializer_class.page_with_options(options, false)
