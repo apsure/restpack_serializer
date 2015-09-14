@@ -12,7 +12,15 @@ module RestPack
         foreign_keys = @models.map { |model| model.send(@association.foreign_key) }
                               .compact
                               .uniq
-        side_load = @association.klass.find(foreign_keys)
+
+        # Optionally load scope from the associated serializer
+        scope = @association.klass
+        if @serializer.class.respond_to?(:scope)
+          scope = @serializer.class.send(:scope, scope, options.context)
+        end
+
+        side_load = scope.find(foreign_keys)
+
         json_model_data = side_load.map { |model| @serializer.as_json(model) }
         { @association.plural_name.to_sym => json_model_data, meta: { } }
       end
