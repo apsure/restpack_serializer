@@ -39,10 +39,6 @@ describe RestPack::Serializer::Attributes do
     options[:number][:async].should == true
   end
 
-  it "correctly removed key from options" do
-    options[:new_key].has_key?(:key).should == false
-  end
-
   describe "optional attributes" do
     let(:model) { OpenStruct.new(a: 'A', sometimes: 'SOMETIMES', gonzaga: 'GONZAGA') }
     let(:context) { {} }

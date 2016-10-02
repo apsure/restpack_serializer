@@ -85,7 +85,7 @@ module RestPack::Serializer::Attributes
     end
 
     def add_to_serializable(name, options = {})
-      options[:key] || name.to_sym
+      options[:key] ||= name.to_sym
 
       @serializable_attributes ||= {}
       @serializable_attributes[options[:key]] = {
