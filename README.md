@@ -9,6 +9,10 @@ restpack_serializer allows you to quickly provide a set of RESTful endpoints for
 
 ---
 
+**NOTE: This gem needs maintainers**: https://github.com/RestPack/restpack_serializer/issues/128
+
+---
+
 * [An overview of RestPack](http://www.slideshare.net/gavinjoyce/taming-monolithic-monsters)
 * [JSON API](http://jsonapi.org/)
 
@@ -63,6 +67,8 @@ end
 class AlbumSerializer
   include RestPack::Serializer
   attributes :id, :title, :year, :artist_id, :extras
+  optional :score
+
   can_include :artists, :songs
   can_filter_by :year
 
@@ -76,6 +82,18 @@ end
 
 ```ruby
 AlbumSerializer.as_json(album, { admin?: true })
+```
+
+All `attributes` are serialized by default. If you'd like to skip an attribute, you can pass an option in the `@context` as follows:
+
+```ruby
+AlbumSerializer.as_json(album, { include_title?: false })
+```
+
+You can also define `optional` attributes which aren't included by default. To include:
+
+```ruby
+AlbumSerializer.as_json(album, { include_score?: true })
 ```
 
 ## Exposing an API
@@ -114,8 +132,7 @@ AlbumSerializer.page(params, Albums.where("year < 1950"), { admin?: true })
 ```
 
 Other features:
- * [Dynamically Include/Exclude Attributes](https://github.com/RestPack/restpack_serializer/blob/master/spec/serializable/serializer_spec.rb#L42)
- * [Custom Attributes Hash](https://github.com/RestPack/restpack_serializer/blob/master/spec/serializable/serializer_spec.rb#L46)
+ * [Custom Attributes Hash](https://github.com/RestPack/restpack_serializer/blob/master/spec/serializable/serializer_spec.rb#L55)
 
 ## Paging
 
