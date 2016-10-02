@@ -9,9 +9,7 @@ module RestPack
       end
 
       def side_load_belongs_to(options)
-        foreign_keys = @models.map { |model| model.send(@association.foreign_key) }
-                              .compact
-                              .uniq
+        foreign_keys = @models.map { |model| model.send(@association.foreign_key) }.uniq.compact
 
         # Optionally load scope from the associated serializer
         scope = @association.klass
@@ -19,8 +17,7 @@ module RestPack
           scope = @serializer.class.send(:scope, scope, options.context)
         end
 
-        side_load = scope.find(foreign_keys)
-
+        side_load = foreign_keys.any? ? scope.find(foreign_keys) : []
         json_model_data = side_load.map { |model| @serializer.as_json(model) }
         { @association.plural_name.to_sym => json_model_data, meta: { } }
       end
@@ -28,7 +25,7 @@ module RestPack
       def side_load_has_many(options)
         has_association_relation(options) do |options|
           if join_table = @association.options[:through]
-            options.scope = options.scope.joins(join_table)
+            options.scope = options.scope.joins(join_table).distinct
             association_fk = @association.through_reflection.foreign_key.to_sym
             options.filters = { join_table => { association_fk => model_ids } }
           else
