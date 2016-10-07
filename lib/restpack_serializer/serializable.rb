@@ -57,7 +57,7 @@ module RestPack
       end
 
       add_custom_attributes(data)
-      add_links(model, data) unless self.class.associations.empty?
+      add_links(model, data, context) unless self.class.associations.empty?
 
       data
     end
@@ -108,18 +108,22 @@ module RestPack
       end
     end
 
-    def add_links(model, data)
+    def add_links(model, data, context = {})
       self.class.associations.each do |association|
         data[:links] ||= {}
         links_value = case
         when association.macro == :belongs_to
           model.send(association.foreign_key).try(:to_s)
-        # when association.macro.to_s.match(/has_/)
-        #   if model.send(association.name).loaded?
-        #     model.send(association.name).collect { |associated| associated.id.to_s }
-        #   else
-        #     model.send(association.name).pluck(:id).map(&:to_s)
-        #   end
+        when association.macro.to_s.match(/has_/)
+          if context[:include_has_many_links]
+            if model.send(association.name).loaded?
+              model.send(association.name).collect { |associated| associated.id.to_s }
+            else
+              model.send(association.name).pluck(:id).map(&:to_s)
+            end
+          else
+            nil
+          end
         end
         unless links_value.blank?
           data[:links][association.name.to_sym] = links_value
