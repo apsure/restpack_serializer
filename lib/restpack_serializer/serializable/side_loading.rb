@@ -70,7 +70,7 @@ module RestPack::Serializer::SideLoading
 
     def association_from_include(include)
       raise_invalid_include(include) unless can_include?(include)
-      possible_relations = [include.to_s.singularize.to_sym, include]
+      possible_relations = [include, include.to_s.singularize.to_sym]
       select_association_from_possibles(possible_relations)
     end
 

@@ -115,7 +115,10 @@ module RestPack
         when association.macro == :belongs_to
           model.send(association.foreign_key).try(:to_s)
         when association.macro.to_s.match(/has_/)
-          if context[:include_has_many_links]
+          if context[:include_has_many_links] || association.macro.to_s == "has_and_belongs_to_many"
+            if association.macro.to_s == "has_and_belongs_to_many"
+              p "#{association.name}: has_and_belongs_to_many"
+            end
             if model.send(association.name).loaded?
               model.send(association.name).collect { |associated| associated.id.to_s }
             else
